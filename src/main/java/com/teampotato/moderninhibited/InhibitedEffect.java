@@ -1,22 +1,23 @@
 package com.teampotato.moderninhibited;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
-import net.minecraft.world.GameType;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class InhibitedEffect extends Effect {
+public class InhibitedEffect extends MobEffect {
     protected InhibitedEffect() {
-        super(EffectType.HARMFUL, 16711680);
+        super(MobEffectCategory.HARMFUL, 16711680);
     }
 
     public void applyEffectTick(LivingEntity pLivingEntity, int pAmplifier) {
-        if (pLivingEntity instanceof PlayerEntity && !((PlayerEntity) pLivingEntity).isCreative() && !pLivingEntity.isSpectator()) {
-            ((PlayerEntity) pLivingEntity).setGameMode(GameType.ADVENTURE);
+        if (pLivingEntity instanceof Player && !((ServerPlayer) pLivingEntity).isCreative() && !pLivingEntity.isSpectator()) {
+            ((ServerPlayer) pLivingEntity).setGameMode(GameType.ADVENTURE);
         }
     }
 
