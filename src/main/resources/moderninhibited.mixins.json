@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.teampotato.moderninhibited.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "moderninhibited.refmap.json",
+  "mixins": [
+    "MixinServerPlayer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
