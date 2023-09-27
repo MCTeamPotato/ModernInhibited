@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "moderninhibited",
+	"version": "${version}",
+	"name": "ModernInhibited",
+	"description": "A Minecraft Mod",
+	"authors": [
+		"Team Potato"
+	],
+	"contact": {
+		"homepage": "https://legacy.curseforge.com/minecraft/mc-mods/modern-inhibited",
+		"sources": "https://github.com/MCTeamPotato/ModernInhibited"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.teampotato.moderninhibited.ModernInhibited"
+		]
+	},
+	"mixins": [
+		"moderninhibited.mixins.json"
+	],
+	"depends": {
+		"minecraft": "*"
+	}
+}

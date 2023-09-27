@@ -1,38 +1,34 @@
 package com.teampotato.moderninhibited;
 
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.world.effect.MobEffect;
+import net.fabricmc.api.ModInitializer;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
 
-@Mod(ModernInhibited.ID)
-public class ModernInhibited {
-    public static final String ID = "moderninhibited";
-    public static final DeferredRegister<MobEffect> EFFECT_DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, ID);
+public class ModernInhibited implements ModInitializer {
+	public static final StatusEffect inhibited = new InhibitedEffect();
 
-    @SuppressWarnings("unused") public static final RegistryObject<MobEffect> INHIBITED =  EFFECT_DEFERRED_REGISTER.register("inhibited", InhibitedEffect::new);
+	@Override
+	public void onInitialize() {
+		ForgeConfigRegistry.INSTANCE.register("moderninhibited", ModConfig.Type.COMMON, config);
+		Registry.register(Registries.STATUS_EFFECT, new Identifier("moderninhibited", "inhibited"), inhibited);
+	}
 
-    public ModernInhibited() {
-        EFFECT_DEFERRED_REGISTER.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, config);
-    }
+	public static final ForgeConfigSpec config;
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> validStructures;
 
-    public static final ForgeConfigSpec config;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> validStructures;
-
-    static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        builder.push("ModernInhibited");
-        validStructures = builder.defineList("validStructures", new ObjectArrayList<>(), o -> true);
-        builder.pop();
-        config = builder.build();
-    }
+	static {
+		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+		builder.push("ModernInhibited");
+		validStructures = builder.defineList("validStructures", new ObjectArrayList<>(), o -> true);
+		builder.pop();
+		config = builder.build();
+	}
 }

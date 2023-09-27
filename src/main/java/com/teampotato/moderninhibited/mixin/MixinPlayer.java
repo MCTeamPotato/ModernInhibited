@@ -1,17 +1,17 @@
 package com.teampotato.moderninhibited.mixin;
 
 import com.teampotato.moderninhibited.ModernInhibited;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.structure.StructureStart;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,8 +19,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Player.class)
+@Mixin(PlayerEntity.class)
 public abstract class MixinPlayer extends LivingEntity {
+    protected MixinPlayer(EntityType<? extends LivingEntity> entityType, World world) {
+        super(entityType, world);
+    }
+
     @Shadow public abstract boolean isSpectator();
 
     @Shadow public abstract boolean isCreative();
@@ -28,23 +32,19 @@ public abstract class MixinPlayer extends LivingEntity {
     @Unique
     private int mi$tickCount;
 
-    protected MixinPlayer(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
-        super(pEntityType, pLevel);
-    }
-
-    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z", shift = At.Shift.AFTER, ordinal = 2))
+    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;isClient:Z", shift = At.Shift.AFTER, ordinal = 2))
     private void onTick(CallbackInfo ci) {
         mi$tickCount++;
-        if (this.hasEffect(ModernInhibited.INHIBITED.get()) || this.isSpectator() || this.isCreative() || mi$tickCount % 40 != 0) return;
-        BlockPos blockPosition = this.blockPosition();
-        ChunkAccess chunkAccess = this.level.getChunkAt(blockPosition);
-        chunkAccess.getAllReferences().keySet().forEach(structure -> {
-            if (this.level instanceof ServerLevel serverLevel) {
-                StructureStart structureStart = serverLevel.structureManager().getStructureAt(blockPosition, structure);
-                if (!structureStart.equals(StructureStart.INVALID_START)) {
-                    ResourceLocation id = Registry.STRUCTURE_TYPES.getKey(structure.type());
+        if (this.hasStatusEffect(ModernInhibited.inhibited) || this.isSpectator() || this.isCreative() || mi$tickCount % 40 != 0) return;
+        BlockPos blockPosition = this.getBlockPos();
+        Chunk chunkAccess = this.getWorld().getChunk(blockPosition);
+        chunkAccess.getStructureReferences().keySet().forEach(structure -> {
+            if (this.getWorld() instanceof ServerWorld serverLevel) {
+                StructureStart structureStart = serverLevel.getStructureAccessor().getStructureContaining(blockPosition, structure);
+                if (!structureStart.equals(StructureStart.DEFAULT)) {
+                    Identifier id = Registries.STRUCTURE_TYPE.getId(structure.getType());
                     if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
-                        this.addEffect(new MobEffectInstance(ModernInhibited.INHIBITED.get(), 200));
+                        this.addStatusEffect(new StatusEffectInstance(ModernInhibited.inhibited, 200));
                     }
                 }
             }

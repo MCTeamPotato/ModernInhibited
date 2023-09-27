@@ -1,14 +1,12 @@
 package com.teampotato.moderninhibited;
 
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectCategory;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectCategory;
 
-@ParametersAreNonnullByDefault
-public class InhibitedEffect extends MobEffect {
+public class InhibitedEffect extends StatusEffect {
     protected InhibitedEffect() {
-        super(MobEffectCategory.HARMFUL, 16711680);
+        super(StatusEffectCategory.HARMFUL, 16711680);
     }
 
     public boolean isBeneficial() {
