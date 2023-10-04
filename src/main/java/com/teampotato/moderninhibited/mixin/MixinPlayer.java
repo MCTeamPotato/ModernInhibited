@@ -4,13 +4,12 @@ import com.teampotato.moderninhibited.ModernInhibited;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,21 +32,19 @@ public abstract class MixinPlayer extends LivingEntity {
         super(pEntityType, pLevel);
     }
 
-    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z", shift = At.Shift.AFTER, ordinal = 2))
+    @Inject(method = "tick", at = @At(value = "INVOKE", remap = false, target = "Lnet/minecraftforge/event/ForgeEventFactory;onPlayerPreTick(Lnet/minecraft/world/entity/player/Player;)V", shift = At.Shift.AFTER))
     private void onTick(CallbackInfo ci) {
         mi$tickCount++;
         if (this.hasEffect(ModernInhibited.INHIBITED.get()) || this.isSpectator() || this.isCreative() || mi$tickCount % 40 != 0) return;
         BlockPos blockPosition = this.blockPosition();
-        ChunkAccess chunkAccess = this.level.getChunkAt(blockPosition);
-        for (Structure structure : chunkAccess.getAllReferences().keySet()) {
-            if (this.level instanceof ServerLevel serverLevel) {
-                StructureStart structureStart = serverLevel.structureManager().getStructureAt(blockPosition, structure);
-                if (!structureStart.equals(StructureStart.INVALID_START)) {
-                    ResourceLocation id = BuiltinRegistries.STRUCTURES.getKey(structure);
-                    if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
-                        this.addEffect(new MobEffectInstance(ModernInhibited.INHIBITED.get(), 200));
-                        break;
-                    }
+        LevelChunk levelChunk = this.level.getChunkAt(blockPosition);
+        for (Structure structure : levelChunk.getAllReferences().keySet()) {
+            StructureStart structureStart = levelChunk.getStartForStructure(structure);
+            if (structureStart != null && structureStart.getBoundingBox().isInside(this.blockPosition())) {
+                ResourceLocation id = BuiltinRegistries.STRUCTURES.getKey(structure);
+                if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
+                    this.addEffect(new MobEffectInstance(ModernInhibited.INHIBITED.get(), 200));
+                    break;
                 }
             }
         }
