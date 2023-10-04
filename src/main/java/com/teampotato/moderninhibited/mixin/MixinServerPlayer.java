@@ -30,11 +30,8 @@ public abstract class MixinServerPlayer extends PlayerEntity {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
-        if (this.isCreative() || this.isSpectator()) return;
-        if (this.hasEffect(ModernInhibited.INHIBITED.get()) && this.gameMode.isSurvival()) {
+        if (!this.isSpectator() && !this.isCreative() && this.hasEffect(ModernInhibited.INHIBITED.get()) && this.gameMode.getGameModeForPlayer().equals(GameType.SURVIVAL)) {
             this.setGameMode(GameType.ADVENTURE);
-        } else if (!this.hasEffect(ModernInhibited.INHIBITED.get()) && this.gameMode.getGameModeForPlayer().equals(GameType.ADVENTURE)) {
-            this.setGameMode(GameType.SURVIVAL);
         }
     }
 }
