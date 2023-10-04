@@ -5,13 +5,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.structure.Structure;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -38,16 +38,15 @@ public abstract class MixinPlayer extends LivingEntity {
         if (this.hasStatusEffect(ModernInhibited.inhibited) || this.isSpectator() || this.isCreative() || mi$tickCount % 40 != 0) return;
         BlockPos blockPosition = this.getBlockPos();
         Chunk chunkAccess = this.getWorld().getChunk(blockPosition);
-        chunkAccess.getStructureReferences().keySet().forEach(structure -> {
-            if (this.getWorld() instanceof ServerWorld serverLevel) {
-                StructureStart structureStart = serverLevel.getStructureAccessor().getStructureContaining(blockPosition, structure);
-                if (!structureStart.equals(StructureStart.DEFAULT)) {
-                    Identifier id = Registries.STRUCTURE_TYPE.getId(structure.getType());
-                    if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
-                        this.addStatusEffect(new StatusEffectInstance(ModernInhibited.inhibited, 200));
-                    }
+        for (Structure structure : chunkAccess.getStructureReferences().keySet()) {
+            StructureStart structureStart = chunkAccess.getStructureStart(structure);
+            if (structureStart != null && structureStart.getBoundingBox().contains(blockPosition)) {
+                Identifier id = this.getWorld().getRegistryManager().get(RegistryKeys.STRUCTURE).getId(structure);
+                if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
+                    this.addStatusEffect(new StatusEffectInstance(ModernInhibited.inhibited, 200));
+                    break;
                 }
             }
-        });
+        }
     }
 }

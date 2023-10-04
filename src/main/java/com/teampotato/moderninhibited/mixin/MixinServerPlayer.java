@@ -30,8 +30,6 @@ public abstract class MixinServerPlayer extends PlayerEntity {
         if (this.isCreative() || this.isSpectator()) return;
         if (this.hasStatusEffect(ModernInhibited.inhibited) && this.interactionManager.isSurvivalLike()) {
             this.changeGameMode(GameMode.ADVENTURE);
-        } else if (!this.hasStatusEffect(ModernInhibited.inhibited) && this.interactionManager.getGameMode().equals(GameMode.ADVENTURE)) {
-            this.changeGameMode(GameMode.SURVIVAL);
         }
     }
 }
