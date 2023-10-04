@@ -29,7 +29,7 @@ public abstract class MixinPlayer extends LivingEntity {
     @Unique
     private int mi$tickCount;
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/hooks/BasicEventHooks;onPlayerPreTick(Lnet/minecraft/entity/player/PlayerEntity;)V", shift = At.Shift.AFTER))
+    @Inject(method = "tick", at = @At(value = "INVOKE", remap = false, target = "Lnet/minecraftforge/fml/hooks/BasicEventHooks;onPlayerPreTick(Lnet/minecraft/entity/player/PlayerEntity;)V", shift = At.Shift.AFTER))
     private void onTick(CallbackInfo ci) {
         mi$tickCount++;
         if (this.hasEffect(ModernInhibited.INHIBITED.get()) || this.isSpectator() || this.isCreative() || mi$tickCount % 40 != 0) return;
