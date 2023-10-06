@@ -11,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
+import net.minecraft.world.server.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,14 +35,16 @@ public abstract class MixinPlayer extends LivingEntity {
         mi$tickCount++;
         if (this.hasEffect(ModernInhibited.INHIBITED.get()) || this.isSpectator() || this.isCreative() || mi$tickCount % 40 != 0) return;
         BlockPos blockPosition = this.blockPosition();
-        Chunk chunk = this.level.getChunkAt(blockPosition);
-        for (Structure<?> structure : chunk.getAllReferences().keySet()) {
-            StructureStart<?> structureStart = chunk.getStartForFeature(structure);
-            if (structureStart != null && structureStart.getBoundingBox().isInside(blockPosition)) {
-                ResourceLocation id = structure.getRegistryName();
-                if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
-                    this.addEffect(new EffectInstance(ModernInhibited.INHIBITED.get(), 200));
-                    break;
+        Chunk chunkAccess = this.level.getChunkAt(blockPosition);
+        for (Structure<?> structure : chunkAccess.getAllReferences().keySet()) {
+            if (this.level instanceof ServerWorld) {
+                StructureStart<?> structureStart = ((ServerWorld)this.level).structureFeatureManager().getStructureAt(blockPosition, true, structure);
+                if (!structureStart.equals(StructureStart.INVALID_START)) {
+                    ResourceLocation id = structure.getRegistryName();
+                    if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
+                        this.addEffect(new EffectInstance(ModernInhibited.INHIBITED.get(), 200));
+                        break;
+                    }
                 }
             }
         }
