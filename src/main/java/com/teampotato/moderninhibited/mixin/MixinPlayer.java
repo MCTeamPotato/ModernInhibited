@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -32,19 +33,21 @@ public abstract class MixinPlayer extends LivingEntity {
     @Unique
     private int mi$tickCount;
 
-    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;isClient:Z", shift = At.Shift.AFTER, ordinal = 2))
+    @Inject(method = "tick", at = @At(value = "INVOKE", remap = false, target = "Lnet/minecraft/entity/player/PlayerEntity;updateWaterSubmersionState()Z", shift = At.Shift.AFTER))
     private void onTick(CallbackInfo ci) {
         mi$tickCount++;
         if (this.hasStatusEffect(ModernInhibited.inhibited) || this.isSpectator() || this.isCreative() || mi$tickCount % 40 != 0) return;
         BlockPos blockPosition = this.getBlockPos();
         Chunk chunkAccess = this.getWorld().getChunk(blockPosition);
         for (Structure structure : chunkAccess.getStructureReferences().keySet()) {
-            StructureStart structureStart = chunkAccess.getStructureStart(structure);
-            if (structureStart != null && structureStart.getBoundingBox().contains(blockPosition)) {
-                Identifier id = this.getWorld().getRegistryManager().get(RegistryKeys.STRUCTURE).getId(structure);
-                if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
-                    this.addStatusEffect(new StatusEffectInstance(ModernInhibited.inhibited, 200));
-                    break;
+            if (this.getWorld() instanceof ServerWorld serverLevel) {
+                StructureStart structureStart = serverLevel.getStructureAccessor().getStructureAt(blockPosition, structure);
+                if (!structureStart.equals(StructureStart.DEFAULT)) {
+                    Identifier id = this.getWorld().getRegistryManager().get(RegistryKeys.STRUCTURE).getId(structure);
+                    if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
+                        this.addStatusEffect(new StatusEffectInstance(ModernInhibited.inhibited, 200));
+                        break;
+                    }
                 }
             }
         }
