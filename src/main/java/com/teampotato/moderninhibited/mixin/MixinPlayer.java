@@ -45,7 +45,7 @@ public abstract class MixinPlayer extends LivingEntity {
                 if (!structureStart.equals(StructureStart.INVALID_START)) {
                     ResourceLocation id = this.level.registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY).getKey(structure);
                     if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
-                        this.addEffect(new MobEffectInstance(ModernInhibited.INHIBITED.get(), 200));
+                        this.addEffect(new MobEffectInstance(ModernInhibited.INHIBITED.get(), 200 , 0, false, ModernInhibited.showParticle.get(), ModernInhibited.showIcon.get()));
                         break;
                     }
                 }
