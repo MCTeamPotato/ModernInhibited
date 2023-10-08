@@ -45,7 +45,7 @@ public abstract class MixinPlayer extends LivingEntity {
                 if (!structureStart.equals(StructureStart.DEFAULT)) {
                     Identifier id = this.getWorld().getRegistryManager().get(RegistryKeys.STRUCTURE).getId(structure);
                     if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
-                        this.addStatusEffect(new StatusEffectInstance(ModernInhibited.inhibited, 200));
+                        this.addStatusEffect(new StatusEffectInstance(ModernInhibited.inhibited, 200, 0, false, ModernInhibited.shouldParticle.get(), ModernInhibited.showIcon.get()));
                         break;
                     }
                 }

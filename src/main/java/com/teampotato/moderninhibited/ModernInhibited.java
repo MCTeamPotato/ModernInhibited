@@ -23,11 +23,14 @@ public class ModernInhibited implements ModInitializer {
 
 	public static final ForgeConfigSpec config;
 	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> validStructures;
+	public static final ForgeConfigSpec.BooleanValue showIcon, shouldParticle;
 
 	static {
 		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 		builder.push("ModernInhibited");
 		validStructures = builder.defineList("validStructures", new ObjectArrayList<>(), o -> true);
+		showIcon = builder.define("showEffectIcon", false);
+		shouldParticle = builder.define("shouldEffectParticle", false);
 		builder.pop();
 		config = builder.build();
 	}
