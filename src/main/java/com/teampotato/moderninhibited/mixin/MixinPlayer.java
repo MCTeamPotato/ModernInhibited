@@ -2,6 +2,7 @@ package com.teampotato.moderninhibited.mixin;
 
 import com.teampotato.moderninhibited.ModernInhibited;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -42,7 +43,7 @@ public abstract class MixinPlayer extends LivingEntity {
             if (this.level instanceof ServerLevel serverLevel) {
                 StructureStart structureStart = serverLevel.structureFeatureManager().getStructureAt(blockPosition, structure);
                 if (!structureStart.equals(StructureStart.INVALID_START)) {
-                    ResourceLocation id = structure.feature.getRegistryName();
+                    ResourceLocation id = this.level.registryAccess().registryOrThrow(Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY).getKey(structure);
                     if (id != null && ModernInhibited.validStructures.get().contains(id.toString())) {
                         this.addEffect(new MobEffectInstance(ModernInhibited.INHIBITED.get(), 200, 0, false, ModernInhibited.showParticle.get(), ModernInhibited.showIcon.get()));
                         break;

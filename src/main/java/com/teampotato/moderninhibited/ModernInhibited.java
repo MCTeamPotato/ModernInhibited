@@ -36,6 +36,7 @@ public class ModernInhibited {
     public static final ForgeConfigSpec config;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> validStructures;
     public static final ForgeConfigSpec.BooleanValue showIcon, showParticle;
+    
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.push("ModernInhibited");
