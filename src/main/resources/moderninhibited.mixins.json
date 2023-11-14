@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "moderninhibited.refmap.json",
   "mixins": [
-    "MixinPlayer"
+    "MixinChunkAccess",
+    "MixinStructure"
   ],
   "injectors": {
     "defaultRequire": 1
