@@ -60,7 +60,7 @@ public class ModernInhibited {
             ServerLevel serverLevel = serverPlayer.getLevel();
             boolean hasInhibited = serverPlayer.hasEffect(INHIBITED.get());
             if (hasInhibited && serverPlayer.gameMode.getGameModeForPlayer().equals(GameType.SURVIVAL)) serverPlayer.setGameMode(GameType.ADVENTURE);
-            ((IServerPlayer)serverPlayer).modernInhibited$setTickCount(((IServerPlayer) serverPlayer).modernInhibited$getTickCount());
+            ((IServerPlayer)serverPlayer).modernInhibited$setTickCount(((IServerPlayer) serverPlayer).modernInhibited$getTickCount() + 1);
             if (hasInhibited || serverPlayer.isSpectator() || serverPlayer.isCreative() || ((IServerPlayer) serverPlayer).modernInhibited$getTickCount() % 30 != 0) return;
             ((IServerPlayer) serverPlayer).modernInhibited$setTickCount(0);
             BlockPos blockPosition = serverPlayer.blockPosition();
