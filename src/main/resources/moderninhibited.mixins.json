@@ -6,7 +6,8 @@
   "refmap": "moderninhibited.refmap.json",
   "mixins": [
     "MixinChunkAccess",
-    "MixinConfiguredStructureFeature"
+    "MixinConfiguredStructureFeature",
+    "MixinServerPlayer"
   ],
   "injectors": {
     "defaultRequire": 1
