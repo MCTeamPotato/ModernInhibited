@@ -1,12 +1,12 @@
 package com.teampotato.moderninhibited;
 
-
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.GameMode;
+import org.jetbrains.annotations.Nullable;
 
 public class InhibitedEffect extends StatusEffect {
     protected InhibitedEffect() {
@@ -17,8 +17,11 @@ public class InhibitedEffect extends StatusEffect {
         return false;
     }
 
-    public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
-        if (entity instanceof ServerPlayerEntity serverPlayer) serverPlayer.changeGameMode(GameMode.SURVIVAL);
-        super.onRemoved(entity, attributes, amplifier);
+    public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
+        if (entity instanceof ServerPlayerEntity serverPlayer && serverPlayer.isCreative()) serverPlayer.removeStatusEffect(this);
     }
+
+    public void applyUpdateEffect(LivingEntity entity, int amplifier) {}
+    public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, int amplifier, double proximity) {}
+    public boolean canApplyUpdateEffect(int duration, int amplifier){ return false;}
 }
