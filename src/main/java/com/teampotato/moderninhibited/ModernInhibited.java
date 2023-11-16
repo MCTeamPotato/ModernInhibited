@@ -1,6 +1,7 @@
 package com.teampotato.moderninhibited;
 
 import com.teampotato.moderninhibited.api.IChunk;
+import com.teampotato.moderninhibited.api.IServerPlayer;
 import com.teampotato.moderninhibited.api.IStructure;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -40,7 +41,6 @@ public class ModernInhibited {
     static {
         INHIBITED = EFFECT_DEFERRED_REGISTER.register("inhibited", () -> InhibitedEffect.INSTANCE);
     }
-    private static int tickCount;
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onServerPlayerTick(TickEvent.@NotNull PlayerTickEvent event) {
@@ -49,9 +49,9 @@ public class ModernInhibited {
             ServerWorld serverLevel = serverPlayer.getLevel();
             boolean hasInhibited = serverPlayer.hasEffect(InhibitedEffect.INSTANCE);
             if (hasInhibited && serverPlayer.gameMode.getGameModeForPlayer().equals(GameType.SURVIVAL)) serverPlayer.setGameMode(GameType.ADVENTURE);
-            tickCount++;
-            if (hasInhibited || serverPlayer.isSpectator() || serverPlayer.isCreative() || tickCount % 30 != 0) return;
-            tickCount = 0;
+            ((IServerPlayer)serverPlayer).modernInhibited$setTickCount(((IServerPlayer) serverPlayer).modernInhibited$getTickCount() + 1);
+            if (hasInhibited || serverPlayer.isSpectator() || serverPlayer.isCreative() || ((IServerPlayer) serverPlayer).modernInhibited$getTickCount() % 30 != 0) return;
+            ((IServerPlayer) serverPlayer).modernInhibited$setTickCount(0);
             BlockPos blockPosition = serverPlayer.blockPosition();
             Chunk chunkAccess = serverLevel.getChunkAt(blockPosition);
             for (Structure<?> structure : ((IChunk)chunkAccess).modernInhibited$getAvailableFeatures()) {
@@ -68,7 +68,7 @@ public class ModernInhibited {
     public void onPotionExpired(PotionEvent.PotionExpiryEvent event) {
         if (event.getPotionEffect() != null && event.getPotionEffect().getEffect().equals(InhibitedEffect.INSTANCE) && event.getEntity() instanceof ServerPlayerEntity) {
             ((ServerPlayerEntity)event.getEntity()).setGameMode(GameType.SURVIVAL);
-            tickCount = 29;
+            ((IServerPlayer) event.getEntity()).modernInhibited$setTickCount(29);
         }
     }
 

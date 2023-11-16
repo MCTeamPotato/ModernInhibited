@@ -6,6 +6,7 @@
   "refmap": "moderninhibited.refmap.json",
   "mixins": [
     "MixinChunk",
+    "MixinServerPlayer",
     "MixinStructure"
   ],
   "injectors": {
