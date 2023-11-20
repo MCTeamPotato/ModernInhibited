@@ -20,11 +20,6 @@ public class InhibitedEffect extends MobEffect {
         return false;
     }
 
-    @Override
-    public boolean isDurationEffectTick(int pDuration, int pAmplifier) {
-        return false;
-    }
-
     @Override public void applyEffectTick(LivingEntity pLivingEntity, int pAmplifier) {}
     @Override public void applyInstantenousEffect(@Nullable Entity pSource, @Nullable Entity pIndirectSource, LivingEntity pLivingEntity, int pAmplifier, double pHealth) {}
 }

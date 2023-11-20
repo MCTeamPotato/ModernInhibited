@@ -2,8 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.teampotato.moderninhibited.mixin",
-  "compatibilityLevel": "JAVA_8",
-  "refmap": "moderninhibited.refmap.json",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MixinChunkAccess",
     "MixinServerPlayer",

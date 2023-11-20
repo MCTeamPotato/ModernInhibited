@@ -1,12 +1,15 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[1,)"
 license="MIT"
 
 [[mods]]
 modId="moderninhibited"
-version="${file.jarVersion}"
+version="${version}"
 displayName="ModernInhibited"
 authors="Team Potato"
 description='''
 
 '''
+
+[[mixins]]
+config = "moderninhibited.mixins.json"

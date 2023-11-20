@@ -1,90 +1,69 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.parchmentmc:librarian:1.+'
-        classpath group: 'org.spongepowered',  name: 'mixingradle', version: '0.7+'
-    }
+plugins {
+    id "dev.architectury.loom" version "1.4-SNAPSHOT"
 }
 
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'org.spongepowered.mixin'
+base {
+    archivesName = "${archives_base_name}"
+}
 
-version = '1.20.1-1.1.0'
-group = 'com.teampotato.moderninhibited'
-archivesBaseName = 'moderninhibited'
+version = "${minecraft_version}-${mod_version}"
+group = "${maven_group}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+}
 
-minecraft {
-    mappings channel: 'parchment', version: '2023.08.20-1.20.1'
-    runs {
-        client {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'info'
+loom {
+    silentMojangMappingsLicense()
+}
 
-            mods {
-                moderninhibited {
-                    source sourceSets.main
-                }
-            }
+repositories {
+    maven { url "https://maven.neoforged.net" }
+    maven { url 'https://jitpack.io' }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
         }
-
-        server {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'info'
-
-            mods {
-                moderninhibited {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'info'
-            args '--mod', 'moderninhibited', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                moderninhibited {
-                    source sourceSets.main
-                }
-            }
+    }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
         }
     }
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.1.44'
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    neoForge "net.neoforged:neoforge:${forge_version}"
 }
 
-mixin {
-    add sourceSets.main, "moderninhibited.refmap.json"
-    config "moderninhibited.mixins.json"
+processResources {
+    inputs.property "version", project.version
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release.set(17)
+}
+
+java {
+    withSourcesJar()
 }
 
 jar {
     manifest {
         attributes([
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"teampotato",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": "moderninhibited.mixins.json"
+                "Implementation-Title"    : archives_base_name,
+                "Implementation-Version"  : mod_version,
+                "Implementation-Vendor"   : mod_author,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
-
-jar.finalizedBy('reobfJar') 
